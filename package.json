@@ -1,0 +1,26 @@
+{
+  "name": "template-testes-automatizados",
+  "version": "1.0.0",
+  "description": "Template base para testes automatizados com Selenium, Mocha e Allure Server",
+  "type": "module",
+  "scripts": {
+    "test": "mocha test/main.test.js --reporter mocha-allure-reporter --timeout 60000",
+    "test:template": "mocha test/suites/suite-template.test.js",
+    "set:chrome": "node test/config/switch-browser.js chrome",
+    "set:firefox": "node test/config/switch-browser.js firefox",
+    "set:local": "node test/config/ambiente-escolhihdo.js local",
+    "set:prod": "node test/config/navegador-escolhihdo.js prod",
+    "allure:server": "bash scripts/start-allure-server.sh"
+  },
+  "devDependencies": {
+    "allure-commandline": "^2.34.0",
+    "allure-js-commons": "^3.2.0",
+    "allure-mocha": "^3.2.0",
+    "chromedriver": "^140",
+    "fs-extra": "^11.2.0",
+    "geckodriver": "^5.0.0",
+    "mocha": "^11.2.2",
+    "mocha-allure-reporter": "^1.4.0",
+    "selenium-webdriver": "^4.21.0"
+  }
+}
