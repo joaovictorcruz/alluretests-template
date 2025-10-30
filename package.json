@@ -6,10 +6,10 @@
   "scripts": {
     "test": "mocha test/main.test.js --reporter mocha-allure-reporter --timeout 60000",
     "test:template": "mocha test/suites/suite-template.test.js",
-    "set:chrome": "node test/config/switch-browser.js chrome",
-    "set:firefox": "node test/config/switch-browser.js firefox",
-    "set:local": "node test/config/ambiente-escolhihdo.js local",
-    "set:prod": "node test/config/navegador-escolhihdo.js prod",
+    "set:chrome": "node test/config/definir-navegador.js chrome",
+    "set:firefox": "node test/config/definir-navegador.js firefox",
+    "set:local": "node test/config/definir-ambiente.js local",
+    "set:prod": "node test/config/definir-ambiente.js prod",
     "allure:server": "bash scripts/start-allure-server.sh"
   },
   "devDependencies": {

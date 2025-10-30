@@ -1,8 +1,8 @@
 import * as allure from "allure-js-commons";
-import { configurarDriver } from "../configuracoes/navegador.config.js";
-import { configurarAmbiente } from "../configuracoes/ambiente.js";
-import { configurarExecutor } from "../configuracoes/executor.js";
-import { abrirSiteCenario } from "../cenarios/abrirSiteCenario.js";
+import { configurarDriver } from "../config/navegador.config.js";
+import { configurarAmbiente } from "../config/enviroment.js";
+import { setupExecutor } from "../config/executor.js";
+import { abrirSiteCenario } from "../happyPath/cenario-base.js";
 
 describe("Validação de acesso ao site", function () {
   this.timeout(60000);
@@ -11,7 +11,7 @@ describe("Validação de acesso ao site", function () {
   before(async function () {
     console.log("🧩 Iniciando suíte de acesso ao site...");
     configurarAmbiente();
-    configurarExecutor();
+    setupExecutor();
     driver = await configurarDriver();
   });
 

@@ -1,10 +1,9 @@
-import { definirAmbiente } from "./ambiente.config.js";
+import fs from 'fs';
+import path from 'path';
 
-const ambiente = process.argv[2]?.toLowerCase();
+const ENV_FILE = path.join(process.cwd(), 'test', 'config', 'env-choice.json');
 
-if (!ambiente || (ambiente !== "local" && ambiente !== "prod")) {
-  console.log("❗ Uso correto: npm run definir:ambiente:local ou npm run definir:ambiente:prod");
-  process.exit(1);
-}
-
-definirAmbiente(ambiente);
+const envName = process.argv[2] || 'local';
+const config = { env: envName.toLowerCase() };
+fs.writeFileSync(ENV_FILE, JSON.stringify(config, null, 2));
+console.log(`✅ Ambiente configurado para: ${envName}`);

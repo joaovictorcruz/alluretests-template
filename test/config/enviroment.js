@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export function configurarAmbiente() {
+function configurarAmbiente() {
   const ambiente = {
     "Navegador": process.env.BROWSER || "Chrome",
     "Versão do Node": process.version || "Node",
@@ -19,3 +19,5 @@ export function configurarAmbiente() {
       .join("\n")
   );
 }
+
+export {configurarAmbiente}

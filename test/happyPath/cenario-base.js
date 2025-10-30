@@ -1,6 +1,6 @@
 import * as allure from "allure-js-commons";
 
-export async function abrirSiteCenario(driver) {
+async function abrirSiteCenario(driver) {
   await allure.step("Acessar o site inicial do Google", async () => {
     await driver.get("https://www.google.com");
 
@@ -15,3 +15,5 @@ export async function abrirSiteCenario(driver) {
     console.log("Página acessada e validada com sucesso!");
   });
 }
+
+export { abrirSiteCenario };
