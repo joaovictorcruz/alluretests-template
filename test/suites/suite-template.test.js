@@ -3,20 +3,22 @@ import { configurarDriver } from "../config/navegador.config.js";
 import { configurarAmbiente } from "../config/enviroment.js";
 import { setupExecutor } from "../config/executor.js";
 import { abrirSiteCenario } from "../happyPath/cenario-base.js";
+import { enviarResultadosParaServidor, setupAllure } from "../../scripts/allure-modo.js";
 
 describe("Validação de acesso ao site", function () {
   this.timeout(60000);
   let driver;
 
   before(async function () {
-    console.log("🧩 Iniciando suíte de acesso ao site...");
+    console.log("Iniciando suíte de acesso ao site...");
     configurarAmbiente();
     setupExecutor();
+    setupAllure();
     driver = await configurarDriver();
   });
 
   after(async function () {
-    console.log("✅ Finalizando suíte de testes...");
+    console.log("Finalizando suíte de testes...");
     await driver.quit();
   });
 
@@ -25,5 +27,6 @@ describe("Validação de acesso ao site", function () {
     allure.suite("Acesso ao Site");
     allure.subSuite("Validação de Página Inicial");
     await abrirSiteCenario(driver);
+    await enviarResultadosParaServidor();
   });
 });
