@@ -29,6 +29,7 @@
     "allure-commandline": "^2.34.0",
     "allure-js-commons": "^3.2.0",
     "allure-mocha": "^3.2.0",
+    "archiver": "^7.0.1",
     "chromedriver": "^142",
     "cross-env": "^7.0.3",
     "fs-extra": "^11.2.0",
