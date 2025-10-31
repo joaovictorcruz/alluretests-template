@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
-import archiver from "archiver";
+import axios from "axios";
+import FormData from "form-data";
 
 const ALLURE_MODE = process.env.ALLURE_MODE || "server";
 const RESULTS_DIR = path.join(process.cwd(), "allure-results");
@@ -12,51 +12,46 @@ const PROJECT_HISTORICO = "testes-historico";
 
 export function setupAllure() {
   if (ALLURE_MODE === "server") {
-    console.log("🧩 Modo Allure: Servidor remoto (Docker Service)");
+    console.log("Modo Allure: Servidor remoto (Docker Service)");
   } else {
-    console.log("🧩 Modo Allure: Local (repositório)");
+    console.log("Modo Allure: Local (repositório)");
     if (!fs.existsSync(RESULTS_DIR)) fs.mkdirSync(RESULTS_DIR);
   }
 }
 
-// Cria projeto no Allure se não existir
-function criarProjetoSeNaoExistir(projectId) {
-  try {
-    const output = execSync(`curl -s ${ALLURE_SERVER_URL}/projects`).toString();
-    if (!output.includes(`"id":"${projectId}"`)) {
-      console.log(`📦 Criando projeto '${projectId}'...`);
-      execSync(
-        `curl -X POST ${ALLURE_SERVER_URL}/projects -H "Content-Type: application/json" -d "{\\"id\\": \\"${projectId}\\"}"`,
-        { stdio: "inherit" }
-      );
-    } else {
-      console.log(`✅ Projeto '${projectId}' já existe.`);
-    }
-  } catch (err) {
-    console.error(`❌ Falha ao criar/verificar projeto '${projectId}':`, err.message);
+async function enviarArquivosAllure(projectId, limparAntes = false) {
+  const files = fs.readdirSync(RESULTS_DIR);
+  if (files.length === 0) {
+    console.warn(`Nenhum arquivo encontrado em ${RESULTS_DIR}`);
+    return;
   }
-}
 
-// Compacta a pasta allure-results usando Node + archiver
-function zipAllureResults(zipFile = "allure-results.zip", sourceDir = RESULTS_DIR) {
-  return new Promise((resolve, reject) => {
-    const output = fs.createWriteStream(zipFile);
-    const archive = archiver("zip", { zlib: { level: 9 } });
+  if (limparAntes) {
+    console.log(`Limpando resultados anteriores do projeto '${projectId}'...`);
+    try {
+      await axios.get(`${ALLURE_SERVER_URL}/clean-history?project_id=${projectId}`);
+    } catch {
+      console.warn(`Falha ao limpar resultados do projeto '${projectId}'.`);
+    }
+  }
 
-    output.on("close", () => {
-      console.log(`📦 ZIP gerado (${(archive.pointer() / 1024).toFixed(1)} KB)`);
-      resolve();
-    });
+  const formData = new FormData();
+  for (const file of files) {
+    const filePath = path.join(RESULTS_DIR, file);
+    formData.append("files[]", fs.createReadStream(filePath), file);
+  }
 
-    archive.on("error", (err) => reject(err));
+  try {
+    const response = await axios.post(
+      `${ALLURE_SERVER_URL}/send-results?project_id=${projectId}`,
+      formData,
+      { headers: formData.getHeaders() }
+    );
 
-    archive.pipe(output);
-
-    // Inclui todos os arquivos e subpastas, incluindo arquivos ocultos
-    archive.glob("**/*", { cwd: sourceDir, dot: true });
-
-    archive.finalize();
-  });
+    console.log(`Envio concluído (${projectId}):`, response.data?.meta_data?.message || "OK");
+  } catch (error) {
+    console.error(`Erro ao enviar resultados para ${projectId}:`, error.response?.data || error.message);
+  }
 }
 
 export async function enviarResultadosParaServidor() {
@@ -65,47 +60,17 @@ export async function enviarResultadosParaServidor() {
     return;
   }
 
-  console.log("🚀 Enviando resultados ao Allure Docker Service...");
-
-  const zipFile = path.resolve("allure-results.zip"); // caminho absoluto
   try {
     if (!fs.existsSync(RESULTS_DIR) || fs.readdirSync(RESULTS_DIR).length === 0) {
-      console.warn("⚠️ A pasta allure-results está vazia. Nenhum arquivo para enviar.");
+      console.warn("A pasta allure-results está vazia. Nenhum arquivo para enviar.");
       return;
     }
 
-    // Remove ZIP antigo
-    if (fs.existsSync(zipFile)) fs.unlinkSync(zipFile);
+    await enviarArquivosAllure(PROJECT_IMEDIATO, true);
+    await enviarArquivosAllure(PROJECT_HISTORICO, false);
 
-    console.log("📦 Compactando resultados com Node...");
-    await zipAllureResults(zipFile);
-
-    // Cria projetos se necessário
-    criarProjetoSeNaoExistir(PROJECT_IMEDIATO);
-    criarProjetoSeNaoExistir(PROJECT_HISTORICO);
-
-    // Limpa resultados anteriores
-    console.log(`🧹 Limpando resultados anteriores do projeto ${PROJECT_IMEDIATO}...`);
-    execSync(`curl -s -X GET ${ALLURE_SERVER_URL}/clean-results?project_id=${PROJECT_IMEDIATO}`, { stdio: "inherit" });
-
-    // Envia para o projeto imediato
-    console.log(`📤 Enviando resultados para: ${PROJECT_IMEDIATO}`);
-    execSync(
-      `curl -X POST -F "results=@${zipFile}" ${ALLURE_SERVER_URL}/send-results?project_id=${PROJECT_IMEDIATO}`,
-      { stdio: "inherit" }
-    );
-
-    // Envia também para o histórico
-    console.log(`📤 Enviando resultados para: ${PROJECT_HISTORICO}`);
-    execSync(
-      `curl -X POST -F "results=@${zipFile}" ${ALLURE_SERVER_URL}/send-results?project_id=${PROJECT_HISTORICO}`,
-      { stdio: "inherit" }
-    );
-
-    console.log("✅ Resultados enviados com sucesso!");
+    console.log("Resultados enviados com sucesso!");
   } catch (err) {
-    console.error("❌ Falha ao enviar resultados:", err.message);
-  } finally {
-    if (fs.existsSync(zipFile)) fs.unlinkSync(zipFile);
+    console.error("Falha ao enviar resultados:", err.message);
   }
 }
