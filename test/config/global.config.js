@@ -47,6 +47,6 @@ export function obterBaseUrl() {
   const ambiente = obterAmbienteAtual();
 
   return ambiente === "prod"
-    ? "https://aaspgerenciador.aasp.org.br"
+    ? "https://google.com"
     : "http://localhost:3000";
 }

@@ -10,16 +10,11 @@ describe("Validação de acesso ao site", function () {
   let driver;
 
   before(async function () {
-    console.log("🧩 Iniciando suíte de acesso ao site...");
-    
-    // Configura Allure
+    console.log("Iniciando suíte de acesso ao site");
     setupAllure();
-
-    // Configura ambiente e executor
     configurarAmbiente();
     setupExecutor();
 
-    // Inicializa driver
     driver = await configurarDriver();
   });
 
@@ -33,6 +28,7 @@ describe("Validação de acesso ao site", function () {
     allure.parentSuite("Fluxo Básico");
     allure.suite("Acesso ao Site");
     allure.subSuite("Validação de Página Inicial");
+    allure.label("Execução", `Run-${Date.now()}`);
     await abrirSiteCenario(driver);
   });
 });
