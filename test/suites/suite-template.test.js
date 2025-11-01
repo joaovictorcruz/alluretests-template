@@ -3,7 +3,7 @@ import { configurarDriver } from "../config/navegador.config.js";
 import { configurarAmbiente } from "../config/enviroment.js";
 import { setupExecutor } from "../config/executor.js";
 import { abrirSiteCenario } from "../happyPath/cenario-base.js";
-import { setupAllure, enviarResultadosParaServidor } from "../../scripts/allure-modo.js";
+import { setupAllure, enviarResultadosParaServidor } from "../../scripts/servicos-allure.js";
 
 describe("Validação de acesso ao site", function () {
   this.timeout(60000);
@@ -20,8 +20,8 @@ describe("Validação de acesso ao site", function () {
 
   after(async function () {
     console.log("✅ Finalizando suíte de testes...");
-    await enviarResultadosParaServidor();
     if (driver) await driver.quit();
+    await enviarResultadosParaServidor();
   });
 
   it("Deve abrir o site do Google e validar o título da página", async function () {
