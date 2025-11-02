@@ -133,6 +133,9 @@ Ideal para execuções completas, como pipelines CI/CD.
 ---
 
 ## 🚀 Como Rodar o Projeto
+Para **executar** esse projeto o ideal é você tenha: 
+- **Node 22.14.0**
+- **Ajuste** a dependência do seus navegadores "**chromedriver": "^140"** e **"geckodriver": "^5.0.0"** no **package.json** para uma versão **compatível com sua máquina.**
 
 ### 1️⃣ **Execução local e geração de relatório**
 
@@ -185,6 +188,11 @@ Você pode hospedar os serviços do Allure em plataformas **gratuitas**, como:
 - [Railway](https://railway.app)
 - [Koyeb](https://www.koyeb.com)
 
+Ou se estiver buscando algo mais robusto e performático para utilizar em ambientes de produção pode ir nas clássicas:
+- [Azure](https://azure.microsoft.com/pt-br/get-started/azure-portal)
+- [AWS](https://railway.app)
+- [GCP](https://www.koyeb.com)
+
 **Passos:**
 1. Faça o deploy das **duas imagens** (`allure` e `allure-ui`) do `docker-compose.yml`.
 2. Atualize as URLs em:
@@ -227,3 +235,11 @@ release/deployed
 ```
 
 > ⚠️ Como o deploy gratuito está hospedado no **Render**, a disponibilidade pode variar — mas a branch serve como **referência prática de configuração**.
+
+---
+
+## 📜 Licença
+
+Este projeto é distribuído sob a licença **MIT**.  
+Sinta-se à vontade para usar, modificar e distribuir.
+Repositório oficial: [https://github.com/joaovictorcruz/alluretests-template](https://github.com/joaovictorcruz/alluretests-template)
