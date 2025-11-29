@@ -40,13 +40,17 @@ export function obterAmbienteAtual() {
   } catch {
     console.log("Arquivo de ambiente não encontrado. Usando 'prod' como padrão.");
   }
-  return "prod"; // 
+  return "prod"; 
 }
 
 export function obterBaseUrl() {
   const ambiente = obterAmbienteAtual();
 
   return ambiente === "prod"
-    ? "https://google.com"
-    : "http://localhost:3000";
+
+    ? "https://www.google.com" 
+    : ambiente === "homolog" 
+    ? "https://www.google.homolog.com" 
+    : "http://host.docker.internal:3000"; 
+
 }
