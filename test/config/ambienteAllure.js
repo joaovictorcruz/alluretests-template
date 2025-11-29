@@ -4,9 +4,9 @@ import path from "path";
 function configurarAmbiente() {
   const ambiente = {
     "Navegador": process.env.BROWSER || "Chrome",
-    "Versão do Node": process.version || "Node",
+    "Node": process.version || "Node",
     "Sistema Operacional": process.platform || "Windows",
-    "URL Base": "https://www.google.com"
+    "URL": "https://www.google.com"
   };
 
   const pasta = "allure-results";

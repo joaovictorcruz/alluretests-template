@@ -5,7 +5,7 @@ import FormData from "form-data";
 
 const ALLURE_MODE = process.env.ALLURE_MODE || "server";
 const RESULTS_DIR = path.join(process.cwd(), "allure-results");
-const ALLURE_SERVER_URL = process.env.ALLURE_SERVER_URL || "http://localhost:5050";
+const ALLURE_SERVER_URL = process.env.ALLURE_SERVER_URL || "http://localhost:5050"; // caso for executar a imagem em um container localmente utilizar essa url http://host.docker.internal:5050 
 
 const PROJECT_IMEDIATO = "testes-imediato";
 const PROJECT_HISTORICO = "testes-historico";
@@ -29,6 +29,7 @@ async function enviarArquivosAllure(projectId, limparAntes = false) {
   if (limparAntes) {
     console.log(`Limpando resultados anteriores do projeto '${projectId}'...`);
     try {
+      await axios.get(`${ALLURE_SERVER_URL}/allure-docker-service/clean-results?project_id=${projectId}`);
       await axios.get(`${ALLURE_SERVER_URL}/allure-docker-service/clean-history?project_id=${projectId}`);
     } catch {
       console.warn(`Falha ao limpar resultados do projeto '${projectId}'.`);
@@ -61,16 +62,27 @@ export async function enviarResultadosParaServidor() {
   }
 
   try {
-    if (!fs.existsSync(RESULTS_DIR) || fs.readdirSync(RESULTS_DIR).length === 0) {
-      console.warn("A pasta allure-results está vazia. Nenhum arquivo para enviar.");
-      return;
-    }
-
     await enviarArquivosAllure(PROJECT_IMEDIATO, true);
     await enviarArquivosAllure(PROJECT_HISTORICO, false);
 
     console.log("Resultados enviados com sucesso!");
   } catch (err) {
     console.error("Falha ao enviar resultados:", err.message);
+  }
+}
+
+export function limparAllureResults() {
+  try {
+    if (fs.existsSync(RESULTS_DIR)) {
+      console.log("Limpando pasta local allure-results...");
+
+      fs.rmSync(RESULTS_DIR, { recursive: true, force: true });
+
+      fs.mkdirSync(RESULTS_DIR);
+    } else {
+      console.log("Pasta allure-results não existe, nenhuma limpeza necessária.");
+    }
+  } catch (error) {
+    console.error("Erro ao limpar pasta allure-results:", error.message);
   }
 }
